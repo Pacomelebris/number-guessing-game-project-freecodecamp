@@ -28,10 +28,10 @@ function main {
     then
       #existing user
       #get user data
-      USER_GAMES_PLAYED=$($PSQL "SELECT COUNT(*) FROM games WHERE username = '$INPUT_USERNAME'")
-      USER_BEST_GAME=$($PSQL "SELECT MIN(number_of_guesses) FROM games WHERE username = '$INPUT_USERNAME'") 
+      USER_GAMES_PLAYED=$($PSQL "SELECT games_played FROM users WHERE username = '$INPUT_USERNAME'")
+      USER_BEST_GAME=$($PSQL "SELECT best_game FROM users WHERE username = '$INPUT_USERNAME'") 
       #message welcome again
-      echo "Welcome back, $INPUT_USERNAME! You have played $USER_GAMES_PLAYED games, and your best game took $USER_BEST_GAME guesses."
+      echo "Welcome back, $EXISTING_USERNAME! You have played $USER_GAMES_PLAYED games, and your best game took $USER_BEST_GAME guesses."
       break
 
     elif [[ $COUNT -eq $COUNT_USERNAME ]]
@@ -57,6 +57,7 @@ function game {
   
   #create a secret random number 
   SECRET_NUMBER=$((1 + $RANDOM % 1000))
+  echo "$SECRET_NUMBER"
 
   #get the user number guess
   unset USER_NUMBER
@@ -109,11 +110,22 @@ function game {
     ((NUMBER_OF_GUESSES++))
   done
 
-  #print the recap of the game
-  echo "You guessed it in $NUMBER_OF_GUESSES tries. The secret number was $SECRET_NUMBER. Nice job!"
-
   #add the game data to the table games
-  ADD_GAME=$($PSQL "INSERT INTO games(username, number_of_guesses) VALUES ('$INPUT_USERNAME', '$NUMBER_OF_GUESSES')")
+  ADD_GAME=$($PSQL "INSERT INTO games(username, number_of_guesses, secret_number) VALUES ('$INPUT_USERNAME', '$NUMBER_OF_GUESSES', $SECRET_NUMBER)")
+
+  #get data of the game from games table
+  GAME_NUMBER_OF_GUESSES=$($PSQL "SELECT number_of_guesses FROM games WHERE game_id = (SELECT MAX(game_id) FROM games)")
+  GAME_SECRET_NUMBER=$($PSQL "SELECT secret_number FROM games WHERE game_id = (SELECT MAX(game_id) FROM games)")
+
+  #print the recap of the game
+  echo -e "\nYou guessed it in $GAME_NUMBER_OF_GUESSES tries. The secret number was $GAME_SECRET_NUMBER. Nice job!"
+
+  #get users data
+  TOTAL_GAMES_PLAYED=$($PSQL "SELECT COUNT(*) FROM games WHERE username = '$INPUT_USERNAME'")
+  BEST_GAME_PLAYED=$($PSQL "SELECT MIN(number_of_guesses) FROM games WHERE username = '$INPUT_USERNAME'")
+
+  #update data of users table
+  UPDATE_TOTAL_GAMES_PLAYED=$($PSQL "UPDATE users SET games_played = $TOTAL_GAMES_PLAYED, best_game = $BEST_GAME_PLAYED WHERE username = '$INPUT_USERNAME'")
 }
 
 
