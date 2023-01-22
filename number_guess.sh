@@ -73,11 +73,11 @@ function game {
   #while the secret number is not found
   #initialize the count of guesses
   NUMBER_OF_GUESSES=1
-  while [ $USER_NUMBER -ne $SECRET_NUMBER ];
+  while [[ $USER_NUMBER != $SECRET_NUMBER ]];
   do
 
     #if the input is higher
-    if [ $USER_NUMBER -gt $SECRET_NUMBER ];
+    if [[ $USER_NUMBER > $SECRET_NUMBER ]];
     then
       echo "It's lower than that, guess again:"
       read USER_NUMBER
@@ -91,7 +91,7 @@ function game {
 
     
     #if the input is lower
-    elif [ $USER_NUMBER -lt $SECRET_NUMBER ];
+    elif [[ $USER_NUMBER < $SECRET_NUMBER ]];
     then
       echo "It's higher than that, guess again:"
       read USER_NUMBER
