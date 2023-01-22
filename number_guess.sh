@@ -48,10 +48,6 @@ do
   fi
 done
 
-
 ADD_GAME=$($PSQL "INSERT INTO games(user_id, number_of_guesses) VALUES('$USER_ID', $COUNT)")
-echo ""You guessed it in $COUNT tries. The secret number was $SECRET_NUMBER. Nice job!""
+echo "You guessed it in $COUNT tries. The secret number was $SECRET_NUMBER. Nice job!"
 exit 0
-
-
-
