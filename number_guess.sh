@@ -15,10 +15,14 @@ function main {
   #initialize the count of users
   COUNT=0
   COUNT_USERNAME=$($PSQL "SELECT COUNT(*) FROM users")
-  echo "$COUNT_USERNAME"
+  echo "nb_users: $COUNT_USERNAME"
   
   echo "$USERNAMES" | while read EXISTING_USERNAME
   do 
+    
+    #count the number of users checked
+    ((COUNT++))
+    echo "count: $COUNT"
 
     if [[ $INPUT_USERNAME == $EXISTING_USERNAME ]]
     then
@@ -29,8 +33,7 @@ function main {
       #message welcome again
       echo "Welcome back, $INPUT_USERNAME! You have played $USER_GAMES_PLAYED games, and your best game took $USER_BEST_GAME guesses."
       break
-      
-    
+
     elif [[ $COUNT -eq $COUNT_USERNAME ]]
       then
       #new user
@@ -40,8 +43,7 @@ function main {
       break
 
     fi
-    #count the number of users checked
-    ((COUNT++))
+    
   done
   game $INPUT_USERNAME
 }
